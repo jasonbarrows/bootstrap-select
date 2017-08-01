@@ -1371,6 +1371,27 @@
       this.$menuInner.on('click', '.divider, .dropdown-header', function (e) {
         e.preventDefault();
         e.stopPropagation();
+        
+        // Jason change to be able to select the header
+        if (that.multiple && $(e.currentTarget).hasClass('dropdown-header')) {
+            var $options = that.$element.find('option'),
+                $optgroup = $(e.currentTarget),
+                optgroupID = $optgroup.data('optgroup'),
+                $optgroupLis = that.$lis.filter('[data-optgroup="' + optgroupID + '"]').not('.divider, .dropdown-header, .disabled, .hidden'),
+                selectAll = $optgroupLis.filter('.selected').length !== $optgroupLis.length;
+
+            if (!$options.eq($optgroupLis.data('originalIndex')).parent().data('maxOptions')) {
+                $optgroupLis.each(function(index) {
+                    var $this = $(this);
+                    $options.eq($this.data('originalIndex')).prop('selected', selectAll);
+                });
+
+                $optgroupLis.toggleClass('selected', selectAll);
+
+                that.render(false);
+            }
+        }        
+        
         if (that.options.liveSearch) {
           that.$searchbox.focus();
         } else {
